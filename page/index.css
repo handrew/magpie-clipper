@@ -148,7 +148,45 @@ body {
 .quotes-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
+}
+
+/* Source groups */
+.source-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.source-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.source-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  text-decoration: none;
+}
+
+.source-name:hover {
+  color: #5c6bc0;
+  text-decoration: underline;
+}
+
+.source-count {
+  font-size: 12px;
+  color: #888;
+}
+
+.source-quotes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .quote-card {
@@ -238,6 +276,17 @@ body {
 }
 
 .quote-source a:hover {
+  text-decoration: underline;
+}
+
+.quote-page-link {
+  color: #888;
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.quote-page-link:hover {
+  color: #5c6bc0;
   text-decoration: underline;
 }
 

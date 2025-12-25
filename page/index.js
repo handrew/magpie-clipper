@@ -111,6 +111,35 @@ function applyFilters() {
   renderQuotes();
 }
 
+function getSourceKey(url) {
+  try {
+    const parsed = new URL(url);
+    // Group by origin + pathname (without query params or hash)
+    return parsed.origin + parsed.pathname;
+  } catch {
+    return url;
+  }
+}
+
+function groupQuotesBySource(quotes) {
+  const groups = {};
+  quotes.forEach(quote => {
+    const sourceKey = getSourceKey(quote.url);
+    if (!groups[sourceKey]) {
+      groups[sourceKey] = [];
+    }
+    groups[sourceKey].push(quote);
+  });
+
+  // Sort groups by number of quotes (descending), then alphabetically
+  return Object.entries(groups).sort((a, b) => {
+    if (b[1].length !== a[1].length) {
+      return b[1].length - a[1].length;
+    }
+    return a[0].localeCompare(b[0]);
+  });
+}
+
 function renderQuotes() {
   const container = document.getElementById('quotesList');
   const emptyState = document.getElementById('emptyState');
@@ -124,25 +153,34 @@ function renderQuotes() {
   container.classList.remove('hidden');
   emptyState.classList.add('hidden');
 
-  container.innerHTML = filteredQuotes.map(quote => `
-    <div class="quote-card" data-id="${quote.id}" data-file="${quote.fileName}">
-      <div class="quote-header">
-        <label class="checkbox-wrapper">
-          <input type="checkbox" class="quote-checkbox" data-id="${quote.id}" ${selectedQuotes.has(quote.id) ? 'checked' : ''}>
-          <span class="checkmark"></span>
-        </label>
-        <span class="quote-file">${escapeHtml(quote.fileName)}</span>
-        <span class="quote-date">${formatDate(quote.savedAt)}</span>
-        <button class="btn-icon btn-icon-danger" data-action="delete" data-id="${quote.id}" data-file="${quote.fileName}" title="Delete">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="3 6 5 6 21 6"></polyline>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-          </svg>
-        </button>
+  const groupedQuotes = groupQuotesBySource(filteredQuotes);
+
+  container.innerHTML = groupedQuotes.map(([sourceUrl, quotes]) => `
+    <div class="source-group">
+      <div class="source-header">
+        <a href="${escapeHtml(sourceUrl)}" target="_blank" class="source-name">${escapeHtml(quotes[0].title || sourceUrl)}</a>
+        <span class="source-count">${quotes.length} quote${quotes.length !== 1 ? 's' : ''}</span>
       </div>
-      <div class="quote-text">${escapeHtml(quote.text)}</div>
-      <div class="quote-source">
-        <a href="${escapeHtml(quote.url)}" target="_blank">${escapeHtml(quote.title || quote.url)}</a>
+      <div class="source-quotes">
+        ${quotes.map(quote => `
+          <div class="quote-card" data-id="${quote.id}" data-file="${quote.fileName}">
+            <div class="quote-header">
+              <label class="checkbox-wrapper">
+                <input type="checkbox" class="quote-checkbox" data-id="${quote.id}" ${selectedQuotes.has(quote.id) ? 'checked' : ''}>
+                <span class="checkmark"></span>
+              </label>
+              <span class="quote-file">${escapeHtml(quote.fileName)}</span>
+              <span class="quote-date">${formatDate(quote.savedAt)}</span>
+              <button class="btn-icon btn-icon-danger" data-action="delete" data-id="${quote.id}" data-file="${quote.fileName}" title="Delete">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+            </div>
+            <div class="quote-text">${escapeHtml(quote.text)}</div>
+          </div>
+        `).join('')}
       </div>
     </div>
   `).join('');
@@ -240,11 +278,22 @@ function exportAll() {
 function generateMarkdown(fileName, file) {
   let md = `# ${fileName}\n\n`;
 
+  // Group quotes by source URL
+  const groupedBySource = {};
   file.quotes.forEach(quote => {
-    md += '---\n\n';
-    md += `> ${quote.text.split('\n').join('\n> ')}\n\n`;
-    md += `**Source:** [${quote.title || 'Link'}](${quote.url})\n`;
-    md += `**Saved:** ${formatDateLong(quote.savedAt)}\n\n`;
+    const sourceKey = getSourceKey(quote.url);
+    if (!groupedBySource[sourceKey]) {
+      groupedBySource[sourceKey] = { title: quote.title, url: quote.url, quotes: [] };
+    }
+    groupedBySource[sourceKey].quotes.push(quote);
+  });
+
+  Object.values(groupedBySource).forEach(group => {
+    md += `## ${group.title || 'Source'}\n`;
+    md += `[Source](${group.url})\n\n`;
+    group.quotes.forEach(quote => {
+      md += `> ${quote.text.split('\n').join('\n> ')}\n\n`;
+    });
   });
 
   return md;
