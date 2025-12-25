@@ -2,6 +2,8 @@
 
 A Chrome extension for collecting and saving text highlights to markdown files. All data stays local on your machine.
 
+![Magpie in action](assets/example.png)
+
 ## Installation
 
 After cloning this repo:
