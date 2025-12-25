@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Magpie</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>Magpie</h1>
+      <div class="header-actions">
+        <button id="openFullPage" class="btn btn-primary" title="Open full page view">
+          View All
+        </button>
+        <button id="exportAll" class="btn btn-secondary" title="Export all files">
+          Export
+        </button>
+        <button id="deleteAll" class="btn btn-danger" title="Delete all files">
+          Delete All
+        </button>
+      </div>
+    </header>
+
+    <div id="fileList" class="file-list">
+      <!-- Files will be rendered here -->
+    </div>
+
+    <div id="emptyState" class="empty-state hidden">
+      <div class="empty-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+        </svg>
+      </div>
+      <p>No saved highlights yet</p>
+      <p class="empty-hint">Highlight text on any page and press<br><kbd>Cmd+Shift+M</kbd> or right-click → Save to Magpie</p>
+    </div>
+
+    <!-- Batch actions bar -->
+    <div id="batchBar" class="batch-bar hidden">
+      <span id="selectedCount">0 selected</span>
+      <button id="batchDelete" class="btn btn-danger">Delete Selected</button>
+    </div>
+  </div>
+
+  <!-- Delete confirmation modal -->
+  <div id="deleteModal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <h3 id="modalTitle">Delete file?</h3>
+      <p id="modalMessage">This will permanently delete this file and all its quotes.</p>
+      <div class="modal-actions">
+        <button id="modalCancel" class="btn btn-secondary">Cancel</button>
+        <button id="modalConfirm" class="btn btn-danger">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

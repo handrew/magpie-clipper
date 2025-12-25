@@ -1,0 +1,184 @@
+/* Floating tooltip styles */
+
+.htmd-tooltip {
+  position: fixed;
+  z-index: 2147483647;
+  width: 280px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-size: 14px;
+  animation: htmd-fadeIn 0.15s ease-out;
+}
+
+@keyframes htmd-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.htmd-tooltip-header {
+  padding: 12px 14px 8px;
+  font-weight: 600;
+  color: #1a1a1a;
+  border-bottom: 1px solid #eee;
+}
+
+.htmd-tooltip-body {
+  padding: 10px;
+}
+
+.htmd-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.htmd-input:focus {
+  border-color: #5c6bc0;
+  box-shadow: 0 0 0 3px rgba(92, 107, 192, 0.15);
+}
+
+.htmd-input::placeholder {
+  color: #999;
+}
+
+.htmd-dropdown {
+  max-height: 180px;
+  overflow-y: auto;
+  margin-top: 8px;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+
+.htmd-dropdown:empty {
+  display: none;
+}
+
+.htmd-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.htmd-dropdown::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.htmd-dropdown-item {
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: background 0.1s;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.htmd-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.htmd-dropdown-item:hover,
+.htmd-dropdown-item.active {
+  background: #f0f2ff;
+}
+
+.htmd-dropdown-item.active {
+  background: #e8ebff;
+}
+
+.htmd-create-new {
+  color: #5c6bc0;
+  font-weight: 500;
+}
+
+.htmd-create-new .htmd-icon {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  text-align: center;
+  background: #5c6bc0;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 12px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.htmd-dropdown-empty {
+  padding: 16px 12px;
+  color: #888;
+  text-align: center;
+  font-size: 13px;
+}
+
+.htmd-tooltip-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-top: 1px solid #eee;
+  background: #fafafa;
+  border-radius: 0 0 8px 8px;
+}
+
+.htmd-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.htmd-btn:active {
+  transform: scale(0.97);
+}
+
+.htmd-btn-save {
+  background: #5c6bc0;
+  color: #fff;
+}
+
+.htmd-btn-save:hover {
+  background: #4a5ab9;
+}
+
+.htmd-hint {
+  font-size: 11px;
+  color: #999;
+}
+
+/* Toast notification */
+
+.htmd-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #333;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  z-index: 2147483647;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.htmd-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
