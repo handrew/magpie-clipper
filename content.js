@@ -5,60 +5,83 @@
   let selectedText = '';
   let selectionRect = null;
   let previousActiveElement = null;
-  let lastMousePos = { x: 0, y: 0 };
+  let lastMousePos = null;
+  let lastSelectionRect = null;
 
-  // Track mouse position for fallback tooltip positioning
+  // Track mouse position and selection for tooltip positioning
   document.addEventListener('mouseup', (e) => {
     lastMousePos = { x: e.clientX, y: e.clientY };
+    // Also capture selection rect on mouseup while it still exists
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0 && selection.toString().trim()) {
+      lastSelectionRect = selection.getRangeAt(0).getBoundingClientRect();
+    }
   });
 
   document.addEventListener('contextmenu', (e) => {
     lastMousePos = { x: e.clientX, y: e.clientY };
-  });
-
-  // Direct keyboard shortcut: Cmd+Shift+M (Mac) or Ctrl+Shift+M (Windows/Linux)
-  document.addEventListener('keydown', (e) => {
-    if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 'm') {
-      const selection = window.getSelection();
-      const text = selection.toString().trim();
-
-      if (text) {
-        e.preventDefault();
-        selectedText = text;
-        previousActiveElement = document.activeElement;
-
-        if (selection.rangeCount > 0) {
-          const range = selection.getRangeAt(0);
-          selectionRect = range.getBoundingClientRect();
-        } else {
-          selectionRect = {
-            bottom: lastMousePos.y,
-            left: lastMousePos.x,
-            top: lastMousePos.y
-          };
-        }
-        showTooltip();
-      }
+    // Capture selection rect on right-click
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0 && selection.toString().trim()) {
+      lastSelectionRect = selection.getRangeAt(0).getBoundingClientRect();
     }
   });
 
   // Listen for messages from background script
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    // Handle keyboard shortcut from commands API
+    if (message.action === 'triggerSave') {
+      const selection = window.getSelection();
+      const text = selection.toString().trim();
+      if (text) {
+        selectedText = text;
+        previousActiveElement = document.activeElement;
+
+        if (selection.rangeCount > 0) {
+          selectionRect = selection.getRangeAt(0).getBoundingClientRect();
+        } else if (lastMousePos) {
+          selectionRect = {
+            bottom: lastMousePos.y,
+            left: lastMousePos.x,
+            top: lastMousePos.y
+          };
+        } else {
+          selectionRect = {
+            bottom: window.innerHeight / 2,
+            left: window.innerWidth / 2 - 150,
+            top: window.innerHeight / 2
+          };
+        }
+        showTooltip();
+      }
+      return;
+    }
+
     if (message.action === 'showTooltip' && message.selectedText) {
       selectedText = message.selectedText.trim();
       previousActiveElement = document.activeElement;
 
-      // Try to get selection rect, fallback to mouse position
+      // Try to get selection rect with multiple fallbacks
       const selection = window.getSelection();
       if (selection.rangeCount > 0 && selection.toString().trim()) {
         const range = selection.getRangeAt(0);
         selectionRect = range.getBoundingClientRect();
-      } else {
+      } else if (lastSelectionRect && lastSelectionRect.width > 0) {
+        // Use cached selection rect from when right-click happened
+        selectionRect = lastSelectionRect;
+      } else if (lastMousePos) {
         // Fallback: use last mouse position
         selectionRect = {
           bottom: lastMousePos.y,
           left: lastMousePos.x,
           top: lastMousePos.y
+        };
+      } else {
+        // Last resort: center of viewport
+        selectionRect = {
+          bottom: window.innerHeight / 2,
+          left: window.innerWidth / 2 - 150,
+          top: window.innerHeight / 2
         };
       }
       showTooltip();

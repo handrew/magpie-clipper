@@ -3,6 +3,14 @@
   "name": "Magpie",
   "version": "1.0.0",
   "description": "Collect and save text highlights to markdown files",
+  "commands": {
+    "save-selection": {
+      "suggested_key": {
+        "default": "Alt+Shift+M"
+      },
+      "description": "Save selected text to Magpie"
+    }
+  },
   "permissions": [
     "storage",
     "activeTab",
